@@ -3,7 +3,7 @@ module github.com/aethiopicuschan/argus
 go 1.24.0
 
 require (
-	github.com/iancoleman/orderedmap v0.3.0
+	github.com/aethiopicuschan/narabi v1.0.0
 	github.com/stretchr/testify v1.10.0
 )
 

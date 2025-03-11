@@ -5,7 +5,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/iancoleman/orderedmap"
+	"github.com/aethiopicuschan/narabi"
 )
 
 type Level string
@@ -64,14 +64,14 @@ func NewLogger(writer io.Writer, opts ...Option) (l *Logger) {
 type Builder struct {
 	logger *Logger
 	level  Level
-	om     *orderedmap.OrderedMap
+	om     *narabi.OrderedMap
 }
 
 func newBuilder(logger *Logger, level Level) (b *Builder) {
 	b = &Builder{
 		logger: logger,
 		level:  level,
-		om:     orderedmap.New(),
+		om:     narabi.New(),
 	}
 	b.Add("level", level)
 	b.Add("time", time.Now())
