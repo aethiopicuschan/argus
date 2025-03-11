@@ -1,7 +1,6 @@
 package argus
 
 import (
-	"encoding/json"
 	"io"
 	"time"
 
@@ -115,7 +114,7 @@ func (b *Builder) Print() (err error) {
 	if severity(b.level) < severity(b.logger.minLevel) {
 		return
 	}
-	jsonData, err := json.Marshal(b.om)
+	jsonData, err := b.om.MarshalJSON()
 	if err != nil {
 		return
 	}
