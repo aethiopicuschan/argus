@@ -1,6 +1,6 @@
 module github.com/aethiopicuschan/argus
 
-go 1.24.0
+go 1.24.2
 
 require (
 	github.com/aethiopicuschan/narabi v1.0.0

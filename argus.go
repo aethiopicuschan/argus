@@ -35,6 +35,7 @@ func severity(level Level) int {
 type Logger struct {
 	writer   io.Writer
 	minLevel Level
+	color    bool
 }
 
 // Option is a functional option for Logger
@@ -47,11 +48,19 @@ func WithMinLevel(level Level) Option {
 	}
 }
 
+// WithColor is an option to enable color output
+func WithColor() Option {
+	return func(l *Logger) {
+		l.color = true
+	}
+}
+
 // NewLogger creates a new Logger
 func NewLogger(writer io.Writer, opts ...Option) (l *Logger) {
 	l = &Logger{
 		writer:   writer,
 		minLevel: Debug,
+		color:    false,
 	}
 	for _, opt := range opts {
 		opt(l)
@@ -114,10 +123,33 @@ func (b *Builder) Print() (err error) {
 	if severity(b.level) < severity(b.logger.minLevel) {
 		return
 	}
+
 	jsonData, err := b.om.MarshalJSON()
 	if err != nil {
 		return
 	}
+
+	// If color is enabled, wrap the entire output
+	if b.logger.color {
+		var colorCode string
+		switch b.level {
+		case Debug:
+			colorCode = "\033[36m" // Cyan
+		case Info:
+			colorCode = "\033[32m" // Green
+		case Warn:
+			colorCode = "\033[33m" // Yellow
+		case Error:
+			colorCode = "\033[31m" // Red
+		default:
+			colorCode = "\033[0m" // Reset (fallback)
+		}
+		coloredData := []byte(colorCode + string(jsonData) + "\033[0m\n")
+		_, err = b.logger.writer.Write(coloredData)
+		return
+	}
+
+	// Normal (non-colored) output
 	jsonData = append(jsonData, '\n')
 	_, err = b.logger.writer.Write(jsonData)
 	return
