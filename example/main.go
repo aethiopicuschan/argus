@@ -12,4 +12,5 @@ func main() {
 	logger.Info().Add("key", "value").Print()
 	logger.Warn().Add("key", "value").Print()
 	logger.Error().Add("key", "value").Print()
+	logger.Fatal().Add("key", "value").Print()
 }
