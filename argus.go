@@ -107,7 +107,7 @@ func (l *Logger) Debug() *Builder {
 }
 
 // Add is a method to add key-value pair to the log
-func (b *Builder) Add(key string, value interface{}) *Builder {
+func (b *Builder) Add(key string, value any) *Builder {
 	b.om.Set(key, value)
 	return b
 }
