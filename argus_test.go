@@ -79,7 +79,7 @@ func TestWithMinLevelCases(t *testing.T) {
 				if buf.Len() == 0 {
 					t.Errorf("expected output, but buffer is empty")
 				} else {
-					var result map[string]interface{}
+					var result map[string]any
 					if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 						t.Fatalf("json.Unmarshal failed: %v", err)
 					}

@@ -2,6 +2,7 @@ package argus
 
 import (
 	"io"
+	"os"
 	"time"
 
 	"github.com/aethiopicuschan/narabi"
@@ -14,6 +15,7 @@ const (
 	Warn  Level = "WARN"
 	Error Level = "ERROR"
 	Debug Level = "DEBUG"
+	Fatal Level = "FATAL"
 )
 
 func severity(level Level) int {
@@ -26,6 +28,8 @@ func severity(level Level) int {
 		return 3
 	case Error:
 		return 4
+	case Fatal:
+		return 5
 	default:
 		return 0
 	}
@@ -106,8 +110,13 @@ func (l *Logger) Debug() *Builder {
 	return newBuilder(l, Debug)
 }
 
+// Fatal is a method to create a log with level FATAL
+func (l *Logger) Fatal() *Builder {
+	return newBuilder(l, Fatal)
+}
+
 // Add is a method to add key-value pair to the log
-func (b *Builder) Add(key string, value interface{}) *Builder {
+func (b *Builder) Add(key string, value any) *Builder {
 	b.om.Set(key, value)
 	return b
 }
@@ -130,8 +139,8 @@ func (b *Builder) Print() (err error) {
 	}
 
 	// If color is enabled, wrap the entire output
+	var colorCode string
 	if b.logger.color {
-		var colorCode string
 		switch b.level {
 		case Debug:
 			colorCode = "\033[36m" // Cyan
@@ -141,16 +150,24 @@ func (b *Builder) Print() (err error) {
 			colorCode = "\033[33m" // Yellow
 		case Error:
 			colorCode = "\033[31m" // Red
+		case Fatal:
+			colorCode = "\033[35m" // Magenta
 		default:
 			colorCode = "\033[0m" // Reset (fallback)
 		}
-		coloredData := []byte(colorCode + string(jsonData) + "\033[0m\n")
-		_, err = b.logger.writer.Write(coloredData)
-		return
 	}
 
-	// Normal (non-colored) output
-	jsonData = append(jsonData, '\n')
+	if colorCode == "" {
+		jsonData = append(jsonData, '\n')
+	} else {
+		jsonData = []byte(colorCode + string(jsonData) + "\033[0m\n")
+	}
 	_, err = b.logger.writer.Write(jsonData)
+	if err != nil {
+		return
+	}
+	if b.level == Fatal {
+		os.Exit(1)
+	}
 	return
 }
